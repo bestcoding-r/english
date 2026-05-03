@@ -3,11 +3,7 @@ import { notFound } from 'next/navigation';
 import { PAPER_DATA, PaperItem } from '../data/papers';
 import { PAPER_PAGES } from '../components/paper-pages';
 
-interface PageProps {
-  params: Promise<{ paperId: string }>;
-}
-
-export default async function PaperPage({ params }: PageProps) {
+export default async function PaperPage({ params }: { params: Promise<{ paperId: string }> }) {
   const { paperId } = await params;
   const paper = PAPER_DATA[paperId];
 
