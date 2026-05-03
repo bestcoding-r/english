@@ -15,7 +15,7 @@ export default async function PaperPage({ params }: PageProps) {
     notFound();
   }
 
-  const PageComponent = PAPER_PAGES[paperId];
+  const PageComponent = PAPER_PAGES[paperId as keyof typeof PAPER_PAGES];
   if (!PageComponent) {
     notFound();
   }

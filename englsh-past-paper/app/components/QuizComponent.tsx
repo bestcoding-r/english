@@ -1,187 +1,37 @@
-// app/english-2018-quiz/page.tsx
 'use client';
 
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Questions data based on the Lahore Board 2018 English Objective Paper
-const quizQuestions = [
-  {
-    id: 1,
-    text: "Joseph averted the widespread disaster by compulsory storage of food.",
-    options: ["Avoided", "Made", "Changed", "Stopped"],
-    correct: 0,
-    explanation: "'Averted' means to prevent or avoid something bad from happening."
-  },
-  {
-    id: 2,
-    text: "The anticipation was always worse than reality.",
-    options: ["Knowledge before hand", "Wait", "Fear", "Delay"],
-    correct: 0,
-    explanation: "Anticipation means expecting or knowing something beforehand."
-  },
-  {
-    id: 3,
-    text: "Most colleges do all they can with scholarship funds to alleviate this situation.",
-    options: ["Assuage", "Improve", "Arrest", "Worsen"],
-    correct: 0,
-    explanation: "'Alleviate' means to make less severe, similar to assuage."
-  },
-  {
-    id: 4,
-    text: "Christopher determined that his next journey should be Timbuktu.",
-    options: ["Resolved", "Hoped", "Opened", "Wished"],
-    correct: 0,
-    explanation: "Determined in this context means firmly decided or resolved."
-  },
-  {
-    id: 5,
-    text: "Allied forces were supervising the police.",
-    options: ["Inspecting", "Hoping", "Calling", "Helping"],
-    correct: 0,
-    explanation: "Supervising means overseeing or inspecting."
-  },
-  {
-    id: 6,
-    text: "Fleming plated the mould on meat broth.",
-    options: ["Food", "Sweet", "Soup", "Fruit"],
-    correct: 2,
-    explanation: "Broth is a soup made from meat or vegetables."
-  },
-  {
-    id: 7,
-    text: "Maynard was dauntless.",
-    options: ["Merciless", "Brave", "Shy", "Meek"],
-    correct: 1,
-    explanation: "Dauntless means fearless and brave."
-  },
-  {
-    id: 8,
-    text: "Ralston was a live wire.",
-    options: ["Alert", "Lazy", "Brave", "Bad man"],
-    correct: 0,
-    explanation: "A 'live wire' means an alert, energetic person."
-  },
-  {
-    id: 9,
-    text: "He had been there for more than a decade.",
-    options: ["Century", "Ten years", "Period", "Fortnight"],
-    correct: 1,
-    explanation: "A decade is a period of ten years."
-  },
-  {
-    id: 10,
-    text: "Mr. Chips was conscientious.",
-    options: ["Honest", "Hard-working", "Clever", "Shy"],
-    correct: 1,
-    explanation: "Conscientious means diligent and hard-working."
-  },
-  {
-    id: 11,
-    text: "I feel sorry ___ the poor.",
-    options: ["for", "with", "about", "on"],
-    correct: 0,
-    explanation: "The correct preposition is 'for': feel sorry for someone."
-  },
-  {
-    id: 12,
-    text: "He jumped ___ the river.",
-    options: ["over", "into", "on", "for"],
-    correct: 1,
-    explanation: "'Jumped into' indicates entering the river."
-  },
-  {
-    id: 13,
-    text: "I will not object ___ what you do.",
-    options: ["to", "for", "in", "on"],
-    correct: 0,
-    explanation: "The correct preposition is 'to': object to something."
-  },
-  {
-    id: 14,
-    text: "He has zeal ___ his country.",
-    options: ["for", "to", "in", "with"],
-    correct: 0,
-    explanation: "Zeal is followed by 'for': zeal for something."
-  },
-  {
-    id: 15,
-    text: "This house is ___ fire.",
-    options: ["in", "on", "of", "by"],
-    correct: 1,
-    explanation: "The phrase is 'on fire'."
-  },
-  {
-    id: 16,
-    text: "He is popular among his students.",
-    options: ["He is popular in his students.", "He is popular with his students."],
-    correct: 1,
-    explanation: "The correct preposition is 'with': popular with someone."
-  },
-  {
-    id: 17,
-    text: "He said to her: 'Please sit down'.",
-    options: [
-      "He requested her to sit down.",
-      "He advised her sit down.",
-      "He told her that sit down.",
-      "He ordered her to sit down."
-    ],
-    correct: 0,
-    explanation: "'Please' indicates a polite request."
-  },
-  {
-    id: 18,
-    text: "Either you or I am wrong.",
-    options: [
-      "Either you or I am wrong.",
-      "Either you or I were wrong.",
-      "Either you or I was wrong.",
-      "Either I or you is wrong."
-    ],
-    correct: 0,
-    explanation: "With 'either...or', the verb agrees with the nearest subject. 'I' takes 'am'."
-  },
-  {
-    id: 19,
-    text: "He is ill from Sunday.",
-    options: [
-      "He is ill for Sunday.",
-      "He has been ill since Sunday.",
-      "He has been ill since Sunday.",
-      "He was ill since Sunday."
-    ],
-    correct: 1,
-    explanation: "Present perfect 'has been' with 'since' for a time in the past."
-  },
-  {
-    id: 20,
-    text: "Please wait little more.",
-    options: [
-      "Please wait the little more.",
-      "Please wait a little more.",
-      "Please wait some little more.",
-      "Please wait much little."
-    ],
-    correct: 1,
-    explanation: "The correct phrase is 'a little more'."
-  }
-];
+export interface Question {
+  id: number;
+  text: string;
+  options: string[];
+  correct: number;
+  explanation: string;
+}
+
+interface QuizComponentProps {
+  questions: Question[];
+  title: string;
+  subtitle?: string;
+  timePerQuestion?: number;
+}
 
 type QuizState = 'start' | 'active' | 'completed';
 
-export default function EnglishQuizPage() {
+export default function QuizComponent({ questions, title, subtitle, timePerQuestion = 30 }: QuizComponentProps) {
   const [quizState, setQuizState] = useState<QuizState>('start');
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState<(number | null)[]>(Array(quizQuestions.length).fill(null));
+  const [selectedAnswers, setSelectedAnswers] = useState<(number | null)[]>(Array(questions.length).fill(null));
   const [showResult, setShowResult] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(30);
+  const [timeLeft, setTimeLeft] = useState(timePerQuestion);
   const [quizStarted, setQuizStarted] = useState(false);
 
-  const currentQuestion = quizQuestions[currentQuestionIndex];
+  const currentQuestion = questions[currentQuestionIndex];
   const hasAnswered = selectedAnswers[currentQuestionIndex] !== null;
   const score = selectedAnswers.reduce<number>((acc, answer, idx) => {
-    if (answer === quizQuestions[idx].correct) return acc + 1;
+    if (answer === questions[idx].correct) return acc + 1;
     return acc;
   }, 0);
 
@@ -192,16 +42,16 @@ export default function EnglishQuizPage() {
       handleNext();
       return;
     }
-    const timer = setTimeout(() => setTimeLeft(prev => prev - 1), 1000);
+    const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
     return () => clearTimeout(timer);
   }, [timeLeft, quizState]);
 
   const handleStartQuiz = () => {
     setQuizState('active');
     setQuizStarted(true);
-    setTimeLeft(30);
+    setTimeLeft(timePerQuestion);
     setCurrentQuestionIndex(0);
-    setSelectedAnswers(Array(quizQuestions.length).fill(null));
+    setSelectedAnswers(Array(questions.length).fill(null));
     setShowResult(false);
   };
 
@@ -213,9 +63,9 @@ export default function EnglishQuizPage() {
   };
 
   const handleNext = () => {
-    if (currentQuestionIndex + 1 < quizQuestions.length) {
+    if (currentQuestionIndex + 1 < questions.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setTimeLeft(30);
+      setTimeLeft(timePerQuestion);
     } else {
       setQuizState('completed');
       setShowResult(true);
@@ -225,7 +75,7 @@ export default function EnglishQuizPage() {
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
-      setTimeLeft(30);
+      setTimeLeft(timePerQuestion);
     }
   };
 
@@ -233,13 +83,13 @@ export default function EnglishQuizPage() {
     setQuizState('start');
     setQuizStarted(false);
     setCurrentQuestionIndex(0);
-    setSelectedAnswers(Array(quizQuestions.length).fill(null));
+    setSelectedAnswers(Array(questions.length).fill(null));
     setShowResult(false);
-    setTimeLeft(30);
+    setTimeLeft(timePerQuestion);
   };
 
   const getScorePercentage = () => {
-    return Math.round((score / quizQuestions.length) * 100);
+    return Math.round((score / questions.length) * 100);
   };
 
   const getScoreMessage = () => {
@@ -265,11 +115,10 @@ export default function EnglishQuizPage() {
               </span>
             </div>
             <h1 className="text-5xl md:text-7xl font-black tracking-tight bg-gradient-to-r from-white via-blue-300 to-purple-400 bg-clip-text text-transparent mb-4">
-              English Quiz
+              {title}
             </h1>
             <p className="text-gray-300 text-lg md:text-xl max-w-2xl mx-auto mb-8">
-              Test your knowledge from the Intermediate Part II English objective paper.
-              {quizQuestions.length} multiple choice questions • 30 seconds per question
+              {subtitle || `Test your knowledge. ${questions.length} multiple choice questions • ${timePerQuestion} seconds per question`}
             </p>
             <div className="flex flex-wrap gap-4 justify-center mb-12">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10">
@@ -313,7 +162,7 @@ export default function EnglishQuizPage() {
                 <span className="text-4xl font-black text-white">{getScorePercentage()}%</span>
               </div>
               <h2 className="text-2xl md:text-3xl font-bold mb-2">Quiz Completed!</h2>
-              <p className="text-gray-300 text-lg">You scored {score} out of {quizQuestions.length}</p>
+              <p className="text-gray-300 text-lg">You scored {score} out of {questions.length}</p>
               <div className="mt-4 p-4 rounded-xl bg-white/5 inline-block mx-auto">
                 <p className="text-gray-200">{getScoreMessage()}</p>
               </div>
@@ -324,7 +173,7 @@ export default function EnglishQuizPage() {
                 <span>📝</span> Detailed Results
               </h3>
               <div className="space-y-4 max-h-96 overflow-y-auto pr-2">
-                {quizQuestions.map((q, idx) => (
+                {questions.map((q, idx) => (
                   <div key={q.id} className={`p-4 rounded-xl border ${
                     selectedAnswers[idx] === q.correct 
                       ? 'border-green-500/30 bg-green-500/10' 
@@ -364,8 +213,8 @@ export default function EnglishQuizPage() {
                   setQuizState('active');
                   setCurrentQuestionIndex(0);
                   setShowResult(false);
-                  setSelectedAnswers(Array(quizQuestions.length).fill(null));
-                  setTimeLeft(30);
+                  setSelectedAnswers(Array(questions.length).fill(null));
+                  setTimeLeft(timePerQuestion);
                 }}
                 className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 font-semibold hover:shadow-lg transition-all"
               >
@@ -384,7 +233,7 @@ export default function EnglishQuizPage() {
         <div className="mb-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <span className="px-3 py-1 rounded-full bg-blue-500/20 text-blue-300 text-xs font-bold uppercase tracking-widest">
-              Question {currentQuestionIndex + 1} of {quizQuestions.length}
+              Question {currentQuestionIndex + 1} of {questions.length}
             </span>
             <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white/10">
               <span className={`text-sm font-mono ${timeLeft <= 10 ? 'text-red-400 animate-pulse' : 'text-gray-300'}`}>
@@ -393,14 +242,14 @@ export default function EnglishQuizPage() {
             </div>
           </div>
           <div className="text-sm text-gray-400">
-            Score: {score}/{quizQuestions.length}
+            Score: {score}/{questions.length}
           </div>
         </div>
 
         <div className="w-full bg-white/10 rounded-full h-1.5 mb-6">
           <div 
             className="bg-gradient-to-r from-blue-500 to-purple-500 h-1.5 rounded-full transition-all duration-300"
-            style={{ width: `${((currentQuestionIndex + (hasAnswered ? 1 : 0)) / quizQuestions.length) * 100}%` }}
+            style={{ width: `${((currentQuestionIndex + (hasAnswered ? 1 : 0)) / questions.length) * 100}%` }}
           ></div>
         </div>
 
@@ -486,19 +335,19 @@ export default function EnglishQuizPage() {
               onClick={handleNext}
               className="px-6 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 font-semibold hover:shadow-lg transition-all"
             >
-              {currentQuestionIndex + 1 === quizQuestions.length ? 'Finish Quiz' : 'Next →'}
+              {currentQuestionIndex + 1 === questions.length ? 'Finish Quiz' : 'Next →'}
             </motion.button>
           )}
         </div>
 
         <div className="mt-8 flex justify-center gap-2 flex-wrap">
-          {quizQuestions.map((_, idx) => (
+          {questions.map((_, idx) => (
             <button
               key={idx}
               onClick={() => {
                 if (selectedAnswers[idx] !== null) {
                   setCurrentQuestionIndex(idx);
-                  setTimeLeft(30);
+                  setTimeLeft(timePerQuestion);
                 }
               }}
               className={`w-8 h-8 rounded-full text-xs font-medium transition-all ${
